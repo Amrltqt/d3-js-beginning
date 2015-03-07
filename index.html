@@ -1,0 +1,162 @@
+<!doctype>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Some stuff ni D3.js</title>
+
+    <!-- Insert CSS link here -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" rel="stylesheet" />
+    <style>
+      body {
+        font: 14px 'helvetica'; /* I love helvetica */
+      }
+
+      .x-axis path,
+      .x-axis line {
+        fill: none;
+        stroke: #000;
+      }
+
+      .y-axis path,
+      .y-axis line {
+        fill: none;
+        stroke: #000;
+      }
+
+      .bar {
+        fill: #4983E6;
+      }
+
+      .red-bar {
+        fill: #E42929;
+      }
+
+      .bar-text {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>D3 Js as a beginner</h1>
+        <hr />
+      </div>
+    </header>
+    <section>
+      <div class="container">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Bar chart</div>
+          </div>
+          <div class="panel-body">
+            <svg id="my-chart-bar"></svg>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- Insert your JS stuff here -->
+    <script type="text/javascript" src="bower_components/dist/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/dist/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript">
+      // We need some data before visualize something.
+      // we'll display some payements or value per month
+      var data = [
+        {month: 'Jan', value: 60},
+        {month: 'Feb', value: 15.3},
+        {month: 'Mar', value: 30},
+        {month: 'Apr', value: 40},
+        {month: 'May', value: 98},
+        {month: 'Jun', value: 10},
+        {month: 'Jul', value: 79},
+        {month: 'Aug', value: 45},
+        {month: 'Sep', value: 31},
+        {month: 'Oct', value: 64},
+        {month: 'Nov', value: 120},
+        {month: 'Dec', value: 110},
+      ];
+
+      // Define margin height & width
+      var margin = {top: 40, right: 20, bottom: 40, left: 40},
+          width = 900 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+      // Detailled x Axis.
+      var xDomain = []
+      for (var i = 0; i < data.length; i++) {
+        xDomain.push(data[i].month);
+      }
+
+      console.log(xDomain);
+
+      // We're in bar chart so we will use rangeRoundBands i think Round seems to be better :D
+      var x = d3.scale.ordinal()
+                .domain(xDomain)   // Input values - Here it's months
+                .rangeRoundBands([0, width]);   // Axis range
+
+      console.log(x.range());
+
+      // Continue with y Axis
+      var y = d3.scale.linear()      // Linear now because we work with integer values in a defined range.
+                .range([height, 0])  // Don't forget that we consider svg by the top/left corner
+                .domain([0, 120]);    // Domain represents - My mind is blown
+
+      console.log(y.range());
+
+      // Ordinal give us the good x on the axis =)
+
+      // We'll try to display this axis
+      // To build axis in d3 we have a helper d3.svg.axis()
+      var xAxis = d3.svg.axis()
+                    .scale(x) // We use x defined before
+                    .orient('bottom'); // put this on bottom
+
+      var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient('left');
+
+
+      // Build svg in html by giving the attributes to the svg element
+      var svg = d3.select('#my-chart-bar') // Access the DOM element by the select helper
+                  // Todo - update width & height
+                  .attr('width', 900)    // Width & height is already configured
+                  .attr('height', 500)  // .attr just put attribute in <svg> element
+                  .append('g')
+                  // Put the svg element in left - top corner considering margins
+                  .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+      // Display axis - The order of inputs is  not important we can insert y axis, some stuff and later x axis
+      // Put the elements in a G element is a good practice.
+      svg.append('g')
+         .attr("class", "x-axis") // if we want to change the CSS for x-axis
+         .attr("transform", 'translate(0, ' + height + ')') // This axis must be in bottom
+         .call(xAxis);
+
+      svg.append('g')
+         .attr("class", "y-axis")
+         .call(yAxis);
+
+      // Append some rect
+      svg.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", function(d) {
+          console.log(d);
+          if (d.value > 50) {
+            return "red-bar";
+          } else {
+            return "bar";
+          }
+        })
+        // We use scalar that we build in y and x variables
+        .attr("x", function(d) { return x(d.month) + 5; })
+        .attr("y", function(d) { return y(d.value); })
+        .attr("width", x.rangeBand() - 10)
+        .attr("height", function(d) { return height - y(d.value); });
+
+
+    </script>
+  </body>
+</html>
