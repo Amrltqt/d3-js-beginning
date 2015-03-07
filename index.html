@@ -6,35 +6,7 @@
 
     <!-- Insert CSS link here -->
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" rel="stylesheet" />
-    <style>
-      body {
-        font: 14px 'helvetica'; /* I love helvetica */
-      }
-
-      .x-axis path,
-      .x-axis line {
-        fill: none;
-        stroke: #000;
-      }
-
-      .y-axis path,
-      .y-axis line {
-        fill: none;
-        stroke: #000;
-      }
-
-      .bar {
-        fill: #4983E6;
-      }
-
-      .red-bar {
-        fill: #E42929;
-      }
-
-      .bar-text {
-        color: #fff;
-      }
-    </style>
+    <link href="style.css" media="screen" rel="stylesheet" />
   </head>
   <body>
     <header>
@@ -61,6 +33,7 @@
     <script type="text/javascript" src="bower_components/dist/js/bootstrap.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript">
+
       // We need some data before visualize something.
       // we'll display some payements or value per month
       var data = [
@@ -74,7 +47,7 @@
         {month: 'Aug', value: 45},
         {month: 'Sep', value: 31},
         {month: 'Oct', value: 64},
-        {month: 'Nov', value: 120},
+        {month: 'Nov', value: 5},
         {month: 'Dec', value: 110},
       ];
 
@@ -82,6 +55,10 @@
       var margin = {top: 40, right: 20, bottom: 40, left: 40},
           width = 900 - margin.left - margin.right,
           height = 500 - margin.top - margin.bottom;
+
+      /**********************************************/
+      /* Build scalar to display x Axis
+      /**********************************************/
 
       // Detailled x Axis.
       var xDomain = []
@@ -91,31 +68,37 @@
 
       console.log(xDomain);
 
-      // We're in bar chart so we will use rangeRoundBands i think Round seems to be better :D
+      // We're in bar chart so we will use rangeRoundBands
       var x = d3.scale.ordinal()
-                .domain(xDomain)   // Input values - Here it's months
+                .domain(xDomain)                // Input values - Here it's months
                 .rangeRoundBands([0, width]);   // Axis range
 
       console.log(x.range());
 
+      /**********************************************/
+      /* Build scalar to display y Axis
+      /**********************************************/
+
       // Continue with y Axis
-      var y = d3.scale.linear()      // Linear now because we work with integer values in a defined range.
-                .range([height, 0])  // Don't forget that we consider svg by the top/left corner
+      var y = d3.scale.linear()       // Linear now because we work with integer values in a defined range.
+                .range([height, 0])   // Don't forget that we consider svg by the top/left corner
                 .domain([0, 120]);    // Domain represents - My mind is blown
 
       console.log(y.range());
 
-      // Ordinal give us the good x on the axis =)
 
-      // We'll try to display this axis
-      // To build axis in d3 we have a helper d3.svg.axis()
+      /**********************************************/
+      /* Create the D3 axis
+      /**********************************************/
+
       var xAxis = d3.svg.axis()
-                    .scale(x) // We use x defined before
-                    .orient('bottom'); // put this on bottom
+                    .scale(x)           // We use x defined above
+                    .orient('bottom');  // put this on bottom
 
       var yAxis = d3.svg.axis()
-                    .scale(y)
-                    .orient('left');
+                    .scale(y)           // We use y defined above
+                    .orient('left');    // Left orientation
+
 
 
       // Build svg in html by giving the attributes to the svg element
@@ -138,10 +121,12 @@
          .attr("class", "y-axis")
          .call(yAxis);
 
-      // Append some rect
-      svg.selectAll(".bar")
+      var barGroup = svg.selectAll(".bar-group")
         .data(data)
-        .enter().append("rect")
+        .enter().append("g")
+        .attr("class", "bar-group");
+
+      barGroup.append("rect")
         .attr("class", function(d) {
           console.log(d);
           if (d.value > 50) {
@@ -155,6 +140,21 @@
         .attr("y", function(d) { return y(d.value); })
         .attr("width", x.rangeBand() - 10)
         .attr("height", function(d) { return height - y(d.value); });
+
+      barGroup.append("text")
+        .attr("class", function(d) {
+          if (height - y(d.value) < 25) {
+            return "bar-text-out";
+          }
+          return "bar-text";
+        })
+        .attr("x", function(d) { return x(d.month) + 10; })
+        .attr("y", function(d) {
+          if (height - y(d.value) < 25) {
+            return y(d.value) - 10;
+          }
+          return y(d.value) + 16; })
+        .text(function(d) { return d.value; });
 
 
     </script>

@@ -1,0 +1,33 @@
+body {
+  font: 14px 'helvetica'; /* I love helvetica */
+}
+
+.x-axis path,
+.x-axis line {
+  fill: none;
+  stroke: #000;
+}
+
+.y-axis path,
+.y-axis line {
+  fill: none;
+  stroke: #000;
+}
+
+.bar {
+  fill: #4983E6;
+}
+
+.red-bar {
+  fill: #E42929;
+}
+
+.bar-text {
+  stroke: #fff;
+  fill: #fff;
+}
+
+.bar-text-out {
+  stroke: #000;
+  fill: #000;
+}
