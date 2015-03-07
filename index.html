@@ -7,6 +7,12 @@
     <!-- Insert CSS link here -->
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" rel="stylesheet" />
     <link href="style.css" media="screen" rel="stylesheet" />
+    <script type="text/javascript">
+      function update_debit_credit(debit, credit) {
+        $("#debit-value").text(debit);
+        $("#credit-value").text(credit);
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -19,36 +25,60 @@
       <div class="container">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title">Bar chart</div>
+            <h3 class="panel-title">Bar chart</h3>
           </div>
           <div class="panel-body">
             <svg id="my-chart-bar"></svg>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              Detail
+            </h3>
+          </div>
+          <div class="panel-body">
+            <div class="col-md-6">
+              <p class="lead">
+                Detail of your debit/credit
+              </p>
+              <ul>
+                <li> Credit: <span id="credit-value"></span></li>
+                <li> Debit: <span id="debit-value"></span></li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <p class="lead">
+                Chart
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
     </section>
     <!-- Insert your JS stuff here -->
-    <script type="text/javascript" src="bower_components/dist/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="bower_components/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript">
 
       // We need some data before visualize something.
       // we'll display some payements or value per month
+
       var data = [
-        {month: 'Jan', value: 60},
-        {month: 'Feb', value: 15.3},
-        {month: 'Mar', value: 30},
-        {month: 'Apr', value: 40},
-        {month: 'May', value: 98},
-        {month: 'Jun', value: 10},
-        {month: 'Jul', value: 79},
-        {month: 'Aug', value: 45},
-        {month: 'Sep', value: 31},
-        {month: 'Oct', value: 64},
-        {month: 'Nov', value: 5},
-        {month: 'Dec', value: 110},
+        {month: 'Jan', value: 60, debit: 50, credit: 70},
+        {month: 'Feb', value: 15.3, debit: 10, credit: 25.3},
+        {month: 'Mar', value: 30, debit: 20, credit: 50},
+        {month: 'Apr', value: 40, debit: 0, credit: 40},
+        {month: 'May', value: 98, debit: 22, credit: 120},
+        {month: 'Jun', value: 10, debit: 5, credit: 5},
+        {month: 'Jul', value: 79, debit: 21, credit: 100},
+        {month: 'Aug', value: 45, debit: 35, credit: 80},
+        {month: 'Sep', value: 31, debit: 9, credit: 40},
+        {month: 'Oct', value: 64, debit: 36, credit: 100},
+        {month: 'Nov', value: 5, debit: 25, credit: 25},
+        {month: 'Dec', value: 110, debit: 10, credit: 100},
       ];
 
       // Define margin height & width
@@ -99,7 +129,9 @@
                     .scale(y)           // We use y defined above
                     .orient('left');    // Left orientation
 
-
+      /**********************************************/
+      /* Create the D3 axis
+      /**********************************************/
 
       // Build svg in html by giving the attributes to the svg element
       var svg = d3.select('#my-chart-bar') // Access the DOM element by the select helper
@@ -121,10 +153,16 @@
          .attr("class", "y-axis")
          .call(yAxis);
 
+      /*****************************************************************/
+      /* Add g element to put rect element & text in the same location */
+      /*****************************************************************/
+
       var barGroup = svg.selectAll(".bar-group")
         .data(data)
         .enter().append("g")
         .attr("class", "bar-group");
+
+      /* Add rect and properties */
 
       barGroup.append("rect")
         .attr("class", function(d) {
@@ -139,7 +177,12 @@
         .attr("x", function(d) { return x(d.month) + 5; })
         .attr("y", function(d) { return y(d.value); })
         .attr("width", x.rangeBand() - 10)
-        .attr("height", function(d) { return height - y(d.value); });
+        .attr("height", function(d) { return height - y(d.value); })
+        .attr("onclick", function(d) {
+          return "update_debit_credit(" + d.debit + ", " + d.credit + ")";
+        });
+
+      /* Add text element */
 
       barGroup.append("text")
         .attr("class", function(d) {
@@ -156,7 +199,7 @@
           return y(d.value) + 16; })
         .text(function(d) { return d.value; });
 
-
+      update_debit_credit(data[0].debit, data[0].credit);
     </script>
   </body>
 </html>

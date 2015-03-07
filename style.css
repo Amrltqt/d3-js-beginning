@@ -18,8 +18,18 @@ body {
   fill: #4983E6;
 }
 
+.bar:hover {
+  fill: #2068E5;
+  cursor: pointer;
+}
+
 .red-bar {
   fill: #E42929;
+}
+
+.red-bar:hover {
+  fill: #D50000;
+  cursor: pointer;
 }
 
 .bar-text {
